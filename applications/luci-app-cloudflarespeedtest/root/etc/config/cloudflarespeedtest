@@ -2,7 +2,6 @@
 config global 'global'
 	option hour '5'
 	option minute '0'
-	option cron_enabled '1'
 	option enabled '0'
 	option ipv6_enabled '0'
 	option advanced '0'

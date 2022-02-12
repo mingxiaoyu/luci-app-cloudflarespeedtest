@@ -26,6 +26,9 @@ msgstr "日志"
 msgid "Enabled"
 msgstr "启用"
 
+msgid "Enabled scheduled task test Cloudflare IP"
+msgstr "启用计划任务测试 Cloudflare IP"
+
 msgid "Broadband speed"
 msgstr "宽带速度"
 

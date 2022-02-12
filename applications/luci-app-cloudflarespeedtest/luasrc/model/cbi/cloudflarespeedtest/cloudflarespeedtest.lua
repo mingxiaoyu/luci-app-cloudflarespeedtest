@@ -13,6 +13,7 @@ s.addremove = false
 s.anonymous = true
 
 o=s:option(Flag,"enabled",translate("Enabled"))
+o.description = translate("Enabled scheduled task test Cloudflare IP")
 o.rmempty=false
 o.default = 0
 
@@ -32,18 +33,13 @@ o=s:option(Value,"custome_url",translate("Custome Url"))
 o.description = translate("<a href=\"https://github.com/XIU2/CloudflareSpeedTest/issues/168\" target=\"_blank\">How to create</a>")
 o.rmempty=false
 
-o=s:option(Flag,"cron_enabled",translate("Cron Enabled"))
-o.rmempty=false
-
 hour = s:option(Value, "hour", translate("Hour"))
 hour.datatype = "range(0,23)"
 hour.rmempty = false
-hour:depends("cron_enabled", 1)
 
 minute = s:option(Value, "minute", translate("Minute"))
 minute.datatype = "range(0,59)"
 minute.rmempty = false
-minute:depends("cron_enabled", 1)
 
 o=s:option(Flag,"advanced",translate("Advanced"))
 o.description = translate("Not recommended")
