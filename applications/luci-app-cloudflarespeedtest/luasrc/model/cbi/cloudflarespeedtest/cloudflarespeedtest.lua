@@ -41,6 +41,13 @@ minute = s:option(Value, "minute", translate("Minute"))
 minute.datatype = "range(0,59)"
 minute.rmempty = false
 
+o = s:option(ListValue, "proxy_mode", translate("Proxy Mode"))
+o:value("nil", translate("HOLD"))
+o.description = translate("during the speed testing, swith to which mode")
+o:value("gfw", translate("GFW List"))
+o:value("close", translate("CLOSE"))
+o.default = gfw
+
 o=s:option(Flag,"advanced",translate("Advanced"))
 o.description = translate("Not recommended")
 o.default = 0
