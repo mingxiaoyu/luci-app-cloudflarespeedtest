@@ -112,10 +112,9 @@ if nixio.fs.access("/etc/config/shadowsocksr") then
 end
 
 
-
-s:tab("passwalltab", translate("passwall"))
 if nixio.fs.access("/etc/config/passwall") then
-	
+	s:tab("passwalltab", translate("passwall"))
+
 	o=s:taboption("passwalltab", Flag, "passwall_enabled",translate("Passwall Enabled"))
 	o.rmempty=true	
 
