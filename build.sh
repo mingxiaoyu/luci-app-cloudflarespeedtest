@@ -37,7 +37,7 @@ cat > $workdir/luci-app-cloudflarespeedtest/CONTROL/postinst <<EOF
 default_postinst \$0 \$@
 EOF
  
-chmod +x $workdir/luci-app-cloudflarespeedtest/usr/bin/cloudflarespeedtest
+chmod +x $workdir/luci-app-cloudflarespeedtest/usr/bin/cloudflarespeedtest/*.sh
 chmod +x $workdir/luci-app-cloudflarespeedtest/CONTROL/postinst
 wget -O $workdir/ipkg-build https://raw.githubusercontent.com/openwrt/openwrt/openwrt-18.06/scripts/ipkg-build && \
 chmod +x $workdir/ipkg-build && \
