@@ -13,11 +13,13 @@ add_cron(){
 	if	[ $enabled = 1 ] ; then 
 		local minute
 		local hour
-		
+		local custome_cors_enabled
+		local custome_cron
+
 		config_get minute $1 minute
 		config_get hour $1 hour
-		config_get_bool $1 custome_cors_enabled
-		config_get  $1 custome_cron
+		config_get_bool custome_cors_enabled $1 custome_cors_enabled
+		config_get custome_cron $1 custome_cron
 
 		if [ $custome_cors_enabled = 1 ] ; then 
 			echo "$custome_cron /usr/bin/cloudflarespeedtest/cloudflarespeedtest.sh start" >> $CRON_FILE
