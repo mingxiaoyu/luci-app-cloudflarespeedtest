@@ -11,7 +11,7 @@ LUCI_TITLE:=LuCI support for Cloudflares Speed Test
 LUCI_DEPENDS:=+cdnspeedtest +openssl-util +curl
 LUCI_PKGARCH:=all
 PKG_VERSION:=1.4.1
-PKG_RELEASE:=0
+PKG_RELEASE:=1
 PKG_LICENSE:=AGPL-3.0
 PKG_MAINTAINER:=mingxiaoyu <fengying0347@163.com>
 
