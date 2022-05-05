@@ -4,7 +4,6 @@ LOG_FILE='/var/log/cloudflarespeedtest.log'
 IP_FILE='/usr/share/cloudflarespeedtestresult.txt'
 IPV4_TXT='/usr/share/CloudflareSpeedTest/ip.txt'
 IPV6_TXT='/usr/share/CloudflareSpeedTest/ipv6.txt'
-HOST_FILE='/usr/bin/cloudflarespeedtest/chloudflarehost'
 
 function get_global_config(){
 	while [[ "$*" != "" ]]; do
@@ -187,8 +186,8 @@ function passwall2_best_ip(){
 		fi
 	fi
 }
-function ssr_best_ip(){
 
+function ssr_best_ip(){
 	if [ $ssr_enabled -eq "1" ] ;then
 		echolog "设置ssr IP"
 		for ssrname in $ssr_services
@@ -197,20 +196,17 @@ function ssr_best_ip(){
 			uci set shadowsocksr.$ssrname.server="${bestip}"
 			uci set shadowsocksr.$ssrname.ip="${bestip}"
 		done
-		uci commit shadowsocksr
-		 	
-	fi
-
-	if [ $ssr_original_server != 'nil' ] ; then
-		echolog "设置ssr代理模式"
-		if [ $proxy_mode  == "close" ] ;then
-			uci set shadowsocksr.@global[0].global_server="${ssr_original_server}"		
-		elif [ $proxy_mode  == "gfw" ] ;then
-			uci set  shadowsocksr.@global[0].run_mode="${ssr_original_run_mode}"
-		fi	
-		uci commit shadowsocksr
-		/etc/init.d/shadowsocksr restart 2 >/dev/null
-		echolog "ssr重启完成"
+    if [ $ssr_original_server != 'nil' ] ; then
+      echolog "设置ssr代理模式"
+      if [ $proxy_mode  == "close" ] ;then
+        uci set shadowsocksr.@global[0].global_server="${ssr_original_server}"		
+      elif [ $proxy_mode  == "gfw" ] ;then
+        uci set  shadowsocksr.@global[0].run_mode="${ssr_original_run_mode}"
+      fi	
+    fi
+    uci commit shadowsocksr
+    /etc/init.d/shadowsocksr restart &>/dev/null
+    echolog "ssr重启完成"
 	fi
 }
 
@@ -222,20 +218,17 @@ function vssr_best_ip(){
 			echo $ssrname
 			uci set vssr.$ssrname.server="${bestip}"
 		done
-		uci commit vssr
-		 	
-	fi
-
-	if [ $vssr_original_server != 'nil' ] ; then
-		echolog "设置Vssr代理模式"
-		if [ $proxy_mode  == "close" ] ;then
-			uci set vssr.@global[0].global_server="${vssr_original_server}"		
-		elif [ $proxy_mode  == "gfw" ] ;then
-			uci set vssr.@global[0].run_mode="${vssr_original_run_mode}"
-		fi	
-		uci commit vssr
-		/etc/init.d/vssr restart 2 >/dev/null
-		echolog "Vssr重启完成"
+    if [ $vssr_original_server != 'nil' ] ; then
+      echolog "设置Vssr代理模式"
+      if [ $proxy_mode  == "close" ] ;then
+        uci set vssr.@global[0].global_server="${vssr_original_server}"		
+      elif [ $proxy_mode  == "gfw" ] ;then
+        uci set vssr.@global[0].run_mode="${vssr_original_run_mode}"
+      fi	
+    fi
+    uci commit vssr
+    /etc/init.d/vssr restart &>/dev/null
+    echolog "Vssr重启完成"
 	fi
 }
 
@@ -247,22 +240,20 @@ function bypass_best_ip(){
 			echo $ssrname
 			uci set bypass.$ssrname.server="${bestip}"
 		done
-		uci commit bypass
-
-	fi
-
-	if [ $bypass_original_server != '$bypass_key_table' ] ; then
-		echolog "设置Bypass代理模式"
-		if [ $proxy_mode  == "close" ] ;then
-			uci set bypass.@global[0].global_server="${bypass_original_server}"		
-		elif [ $proxy_mode  == "gfw" ] ;then
-			uci set  bypass.@global[0].run_mode="${bypass_original_run_mode}"
-		fi	
-		uci commit bypass
-		/etc/init.d/bypass restart 2 >/dev/null
-		echolog "Bypass重启完成"
+    if [ $bypass_original_server != '$bypass_key_table' ] ; then
+      echolog "设置Bypass代理模式"
+      if [ $proxy_mode  == "close" ] ;then
+        uci set bypass.@global[0].global_server="${bypass_original_server}"		
+      elif [ $proxy_mode  == "gfw" ] ;then
+        uci set  bypass.@global[0].run_mode="${bypass_original_run_mode}"
+      fi	
+    fi
+    uci commit bypass
+    /etc/init.d/bypass restart &>/dev/null
+    echolog "Bypass重启完成"
 	fi
 }
+
 function alidns_ip(){
 	if [ $DNS_enabled -eq "1" ] ;then
 		get_servers_config "DNS_type" "app_key" "app_secret" "main_domain" "sub_domain" "line"
@@ -273,19 +264,20 @@ function alidns_ip(){
 	fi
 }
 
-function host_ip(){
-	host_str=$(uci get dhcp.@dnsmasq[0].addnhosts 2>/dev/null)
-	host_str=${host_str//$HOST_FILE/}
+function host_ip() {
 	if [ $HOST_enabled -eq "1" ] ;then
-		get_servers_config "host_domain"
-		cat > $HOST_FILE << EOF
-$bestip $host_domain
-EOF
- 		host_str="$host_str $HOST_FILE"		
- 	fi
-	uci set dhcp.@dnsmasq[0].addnhosts="${host_str}"
-	echolog "HOST 完成"
-	uci commit dhcp
+    get_servers_config "host_domain"
+    HOSTS_LINE="$bestip $host_domain"
+    if [ -n "$(grep $host_domain /etc/hosts)" ]
+        then
+          sed -i".bak" "/$host_domain/d" /etc/hosts
+          echo $HOSTS_LINE >> /etc/hosts;
+        else                             
+          echo $HOSTS_LINE >> /etc/hosts;
+    fi                                
+    /etc/init.d/dnsmasq reload &>/dev/null
+    echolog "HOST 完成"
+  fi
 }
 
 read_config
