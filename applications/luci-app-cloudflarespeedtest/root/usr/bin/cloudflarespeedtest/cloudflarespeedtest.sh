@@ -4,6 +4,7 @@ LOG_FILE='/var/log/cloudflarespeedtest.log'
 IP_FILE='/usr/share/cloudflarespeedtestresult.txt'
 IPV4_TXT='/usr/share/CloudflareSpeedTest/ip.txt'
 IPV6_TXT='/usr/share/CloudflareSpeedTest/ipv6.txt'
+HOST_FILE='/usr/bin/cloudflarespeedtest/chloudflarehost'
 
 function get_global_config(){
 	while [[ "$*" != "" ]]; do
@@ -26,7 +27,7 @@ echolog() {
 
 function read_config(){
 	get_global_config "enabled" "speed" "custome_url" "threads" "custome_cors_enabled" "custome_cron" "t" "tp" "dt" "dn" "dd" "tl" "tll" "ipv6_enabled" "advanced" "proxy_mode"
-	get_servers_config "ssr_services" "ssr_enabled" "passwall_enabled" "passwall_services" "passwall2_enabled" "passwall2_services" "bypass_enabled" "bypass_services" "vssr_enabled" "vssr_services" "DNS_enabled"
+	get_servers_config "ssr_services" "ssr_enabled" "passwall_enabled" "passwall_services" "passwall2_enabled" "passwall2_services" "bypass_enabled" "bypass_services" "vssr_enabled" "vssr_services" "DNS_enabled" "HOST_enabled"
 }
 
 function speed_test(){
@@ -131,7 +132,7 @@ function ip_replace(){
 	bypass_best_ip
 	passwall_best_ip
 	passwall2_best_ip
-	
+	host_ip
 }
 
 function passwall_best_ip(){
@@ -270,6 +271,21 @@ function alidns_ip(){
 			echolog "更新阿里云DNS完成"
 		fi		
 	fi
+}
+
+function host_ip(){
+	host_str=$(uci get dhcp.@dnsmasq[0].addnhosts 2>/dev/null)
+	host_str=${host_str//$HOST_FILE/}
+	if [ $HOST_enabled -eq "1" ] ;then
+		get_servers_config "host_domain"
+		cat > $HOST_FILE << EOF
+$bestip $host_domain
+EOF
+ 		host_str="$host_str $HOST_FILE"		
+ 	fi
+	uci set dhcp.@dnsmasq[0].addnhosts="${host_str}"
+	echolog "HOST 完成"
+	uci commit dhcp
 }
 
 read_config
