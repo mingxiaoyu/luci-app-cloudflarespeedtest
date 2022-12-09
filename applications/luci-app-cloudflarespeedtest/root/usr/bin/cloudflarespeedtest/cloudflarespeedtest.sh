@@ -45,7 +45,7 @@ function speed_test(){
 	command="/usr/bin/cdnspeedtest -sl $((speed*125/1000)) -url ${custome_url} -o ${IP_FILE}"
 
 	if [ $ipv6_enabled -eq "1" ] ;then
-		command="${command} -f ${IPV6_TXT} -ipv6"
+		command="${command} -f ${IPV6_TXT}"
 	else
 		command="${command} -f ${IPV4_TXT}"
 	fi
