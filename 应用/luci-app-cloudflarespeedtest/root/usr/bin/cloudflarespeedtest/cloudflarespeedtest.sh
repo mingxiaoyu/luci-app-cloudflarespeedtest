@@ -143,6 +143,7 @@ function ip_replace(){
 	if [[ -z "${bestip}" ]]; then
 		echolog "CloudflareST 测速结果 IP 数量为 0,跳过下面步骤..."
 	else
+                host_ip
 		alidns_ip
 		ssr_best_ip
 		vssr_best_ip
@@ -150,8 +151,24 @@ function ip_replace(){
 		passwall_best_ip
 		passwall2_best_ip
 		restart_app
-		host_ip	
+		
 	fi
+}
+
+function host_ip() {
+	if [ "x${HOST_enabled}" == "x1" ] ;then
+    get_servers_config "host_domain"
+    HOSTS_LINE="$bestip $host_domain"
+    if [ -n "$(grep $host_domain /etc/hosts)" ]
+        then
+          sed -i".bak" "/$host_domain/d" /etc/hosts
+          echo $HOSTS_LINE >> /etc/hosts;
+        else                             
+          echo $HOSTS_LINE >> /etc/hosts;
+    fi                                
+    /etc/init.d/dnsmasq reload &>/dev/null
+    echolog "HOST 完成"
+  fi
 }
 
 function passwall_best_ip(){
@@ -285,22 +302,6 @@ function alidns_ip(){
 		fi
 		echo "aliyun done"
 	fi
-}
-
-function host_ip() {
-	if [ "x${HOST_enabled}" == "x1" ] ;then
-    get_servers_config "host_domain"
-    HOSTS_LINE="$bestip $host_domain"
-    if [ -n "$(grep $host_domain /etc/hosts)" ]
-        then
-          sed -i".bak" "/$host_domain/d" /etc/hosts
-          echo $HOSTS_LINE >> /etc/hosts;
-        else                             
-          echo $HOSTS_LINE >> /etc/hosts;
-    fi                                
-    /etc/init.d/dnsmasq reload &>/dev/null
-    echolog "HOST 完成"
-  fi
 }
 
 read_config
